@@ -1,0 +1,1 @@
+<section class="error-state"><span>403</span><h1>Acceso restringido</h1><p>Su rol no tiene permiso para ingresar a esta sección.</p><a class="btn admin-primary-btn" href="<?= url('/admin') ?>">Volver al panel</a></section>
