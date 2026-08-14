@@ -2,12 +2,14 @@
     const navToggle = document.querySelector('[data-nav-toggle]');
     const siteNav = document.querySelector('[data-site-nav]');
 
-    const closeNavigation = () => {
+    const closeNavigation = (restoreFocus = false) => {
         if (!navToggle || !siteNav) return;
+        const wasOpen = navToggle.getAttribute('aria-expanded') === 'true';
         navToggle.setAttribute('aria-expanded', 'false');
         navToggle.setAttribute('aria-label', 'Abrir menú');
         siteNav.classList.remove('is-open');
         document.body.classList.remove('site-nav-open');
+        if (restoreFocus && wasOpen) navToggle.focus({ preventScroll: true });
     };
 
     navToggle?.addEventListener('click', () => {
@@ -18,15 +20,38 @@
         document.body.classList.toggle('site-nav-open', willOpen);
     });
 
-    siteNav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeNavigation));
+    siteNav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => closeNavigation()));
+    document.addEventListener('click', (event) => {
+        if (navToggle?.getAttribute('aria-expanded') !== 'true') return;
+        if (siteNav?.contains(event.target) || navToggle.contains(event.target)) return;
+        closeNavigation();
+    });
     window.addEventListener('resize', () => {
         if (window.innerWidth > 900) closeNavigation();
     });
 
+    const revealTargets = [...document.querySelectorAll('main > section')]
+        .filter((section) => !section.matches('.hero,.page-hero,.web-quote-hero'));
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    revealTargets.forEach((target) => target.classList.add('reveal-target'));
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+        revealTargets.forEach((target) => target.classList.add('is-revealed'));
+    } else {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-revealed');
+                observer.unobserve(entry.target);
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -7% 0px' });
+        revealTargets.forEach((target) => revealObserver.observe(target));
+    }
+
     const popup = document.getElementById('ds44-campaign-popup');
     if (!popup) {
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') closeNavigation();
+            if (event.key === 'Escape') closeNavigation(true);
         });
         return;
     }
@@ -76,7 +101,7 @@
     contactLink?.addEventListener('click', () => closePopup(false));
 
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') closeNavigation();
+        if (event.key === 'Escape') closeNavigation(true);
         if (popup.hidden) return;
         if (event.key === 'Escape') closePopup();
         if (event.key === 'Tab') {

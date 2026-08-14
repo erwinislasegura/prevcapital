@@ -31,11 +31,11 @@ $socialNetworks = (array) \App\Core\Config::get('app.social', []);
             <img src="<?= asset('assets/images/logo-prevcapital.png') ?>" alt="PrevCapital">
         </a>
         <nav class="desktop-nav" id="public-navigation" aria-label="Navegación principal" data-site-nav>
-            <a class="<?= ($activePage ?? '') === 'inicio' ? 'active' : '' ?>" href="<?= url('/') ?>">Inicio</a>
-            <a class="<?= ($activePage ?? '') === 'servicios' ? 'active' : '' ?>" href="<?= url('/servicios') ?>">Servicios</a>
-            <a class="<?= ($activePage ?? '') === 'cumplimiento' ? 'active' : '' ?>" href="<?= url('/cumplimiento') ?>">Cumplimiento</a>
-            <a class="<?= ($activePage ?? '') === 'nosotros' ? 'active' : '' ?>" href="<?= url('/nosotros') ?>">Nosotros</a>
-            <a class="<?= ($activePage ?? '') === 'contacto' ? 'active' : '' ?>" href="<?= url('/contacto') ?>">Contacto</a>
+            <a class="<?= ($activePage ?? '') === 'inicio' ? 'active' : '' ?>" <?= ($activePage ?? '') === 'inicio' ? 'aria-current="page"' : '' ?> href="<?= url('/') ?>">Inicio</a>
+            <a class="<?= ($activePage ?? '') === 'servicios' ? 'active' : '' ?>" <?= ($activePage ?? '') === 'servicios' ? 'aria-current="page"' : '' ?> href="<?= url('/servicios') ?>">Servicios</a>
+            <a class="<?= ($activePage ?? '') === 'cumplimiento' ? 'active' : '' ?>" <?= ($activePage ?? '') === 'cumplimiento' ? 'aria-current="page"' : '' ?> href="<?= url('/cumplimiento') ?>">Cumplimiento</a>
+            <a class="<?= ($activePage ?? '') === 'nosotros' ? 'active' : '' ?>" <?= ($activePage ?? '') === 'nosotros' ? 'aria-current="page"' : '' ?> href="<?= url('/nosotros') ?>">Nosotros</a>
+            <a class="<?= ($activePage ?? '') === 'contacto' ? 'active' : '' ?>" <?= ($activePage ?? '') === 'contacto' ? 'aria-current="page"' : '' ?> href="<?= url('/contacto') ?>">Contacto</a>
         </nav>
         <a class="button button--header header__cta" href="<?= url('/contacto') ?>">Solicitar diagnóstico <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="public-navigation" aria-label="Abrir menú" data-nav-toggle>

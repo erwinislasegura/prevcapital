@@ -29,11 +29,11 @@
             <form action="<?= url('/contacto') ?>" method="post">
                 <?= csrf_field() ?>
                 <label class="form-honeypot" aria-hidden="true">Sitio web<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
-                <label>Nombre y apellido<input type="text" placeholder="Ej. Carolina Muñoz" required maxlength="140" name="nombre" value="<?= e(old('nombre')) ?>"></label>
-                <label>Empresa<input type="text" placeholder="Nombre de la organización" required maxlength="160" name="empresa" value="<?= e(old('empresa')) ?>"></label>
-                <div><label>Correo corporativo<input type="email" placeholder="nombre@empresa.cl" required maxlength="180" name="correo" value="<?= e(old('correo')) ?>"></label><label>Teléfono<input type="tel" placeholder="+56 9..." maxlength="60" name="telefono" value="<?= e(old('telefono')) ?>"></label></div>
+                <label>Nombre y apellido<input type="text" placeholder="Ej. Carolina Muñoz" required maxlength="140" name="nombre" autocomplete="name" value="<?= e(old('nombre')) ?>"></label>
+                <label>Empresa<input type="text" placeholder="Nombre de la organización" required maxlength="160" name="empresa" autocomplete="organization" value="<?= e(old('empresa')) ?>"></label>
+                <div><label>Correo corporativo<input type="email" placeholder="nombre@empresa.cl" required maxlength="180" name="correo" autocomplete="email" inputmode="email" value="<?= e(old('correo')) ?>"></label><label><span>Teléfono <small>(opcional)</small></span><input type="tel" placeholder="+56 9..." maxlength="60" name="telefono" autocomplete="tel" inputmode="tel" value="<?= e(old('telefono')) ?>"></label></div>
                 <label>¿Qué necesita resolver?<select name="servicio" required><option value="" disabled <?= old('servicio') ? '' : 'selected' ?>>Seleccione un servicio</option><?php foreach (['Diagnóstico preventivo','Implementación DS N°44','Protocolos MINSAL','Carpeta de arranque minería','ISO 45001','Capacitaciones','Otro requerimiento'] as $service): ?><option <?= selected(old('servicio'), $service) ?>><?= e($service) ?></option><?php endforeach; ?></select></label>
-                <label>Cuéntenos brevemente<textarea name="mensaje" placeholder="Describa la necesidad de su empresa" rows="4" maxlength="3000"><?= e(old('mensaje')) ?></textarea></label>
+                <label><span>Cuéntenos brevemente <small>(opcional)</small></span><textarea name="mensaje" placeholder="Describa la necesidad de su empresa" rows="4" maxlength="3000"><?= e(old('mensaje')) ?></textarea></label>
                 <button class="button button--primary button--full" type="submit">Solicitar contacto <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
             </form>
             <small>Atención a empresas y organizaciones en Chile</small>

@@ -15,5 +15,6 @@
     <link rel="stylesheet" href="<?= asset('assets/css/app.css') ?>">
 </head>
 <body>
-<main id="inicio">
+<a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
 <?php require APP_ROOT . '/app/Views/layouts/public_header_content.php'; ?>
+<main id="contenido-principal" tabindex="-1">
