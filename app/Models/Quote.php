@@ -64,8 +64,8 @@ final class Quote
             $token = bin2hex(random_bytes(32));
             $data += ['public_token' => $token, 'created_by' => $userId, 'updated_by' => $userId];
             $statement = $pdo->prepare(
-                'INSERT INTO quotes (quote_number, public_token, client_id, client_name, company, email, phone, tax_id, address, subject, issue_date, valid_until, currency, subtotal, tax_rate, tax_amount, total, notes, terms, created_by, updated_by)
-                 VALUES (:quote_number, :public_token, :client_id, :client_name, :company, :email, :phone, :tax_id, :address, :subject, :issue_date, :valid_until, :currency, :subtotal, :tax_rate, :tax_amount, :total, :notes, :terms, :created_by, :updated_by)'
+                'INSERT INTO quotes (quote_number, public_token, client_id, client_name, company, email, phone, tax_id, address, subject, issue_date, valid_until, currency, subtotal, discount_type, discount_value, discount_amount, tax_rate, tax_amount, total, notes, terms, created_by, updated_by)
+                 VALUES (:quote_number, :public_token, :client_id, :client_name, :company, :email, :phone, :tax_id, :address, :subject, :issue_date, :valid_until, :currency, :subtotal, :discount_type, :discount_value, :discount_amount, :tax_rate, :tax_amount, :total, :notes, :terms, :created_by, :updated_by)'
             );
             $data['quote_number'] = 'TMP-' . substr($token, 0, 12);
             $statement->execute($data);
@@ -89,7 +89,7 @@ final class Quote
         try {
             $data += ['updated_by' => $userId, 'id' => $id];
             $statement = $pdo->prepare(
-                'UPDATE quotes SET client_id=:client_id, client_name=:client_name, company=:company, email=:email, phone=:phone, tax_id=:tax_id, address=:address, subject=:subject, issue_date=:issue_date, valid_until=:valid_until, currency=:currency, subtotal=:subtotal, tax_rate=:tax_rate, tax_amount=:tax_amount, total=:total, notes=:notes, terms=:terms, updated_by=:updated_by WHERE id=:id'
+                'UPDATE quotes SET client_id=:client_id, client_name=:client_name, company=:company, email=:email, phone=:phone, tax_id=:tax_id, address=:address, subject=:subject, issue_date=:issue_date, valid_until=:valid_until, currency=:currency, subtotal=:subtotal, discount_type=:discount_type, discount_value=:discount_value, discount_amount=:discount_amount, tax_rate=:tax_rate, tax_amount=:tax_amount, total=:total, notes=:notes, terms=:terms, updated_by=:updated_by WHERE id=:id'
             );
             $statement->execute($data);
             self::syncItems($pdo, $id, $items);

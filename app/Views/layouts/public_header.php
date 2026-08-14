@@ -10,7 +10,7 @@
     <link rel="preload" as="image" href="<?= asset('assets/images/hero-industrial.webp') ?>" type="image/webp">
     <link rel="preload" as="image" href="<?= asset('assets/images/logo-prevcapital.png') ?>" type="image/png">
     <?php if (($showCampaignPopup ?? false) === true): ?>
-        <link rel="preload" as="image" href="<?= asset('assets/images/popup-ds44-prevcapital-v2.webp') ?>" type="image/webp">
+        <link rel="preload" as="image" href="<?= asset('assets/images/popup-ds44-prevcapital-v3.webp') ?>" type="image/webp">
     <?php endif; ?>
     <link rel="stylesheet" href="<?= asset('assets/css/app.css') ?>">
 </head>

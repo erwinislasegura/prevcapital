@@ -31,7 +31,7 @@
         return;
     }
 
-    const storageKey = 'prevcapital_ds44_popup_v2_seen';
+    const storageKey = 'prevcapital_ds44_popup_v3_seen';
     const closeButton = popup.querySelector('.campaign-popup__close');
     const contactLink = popup.querySelector('[data-campaign-popup-contact]');
     const closeControls = popup.querySelectorAll('[data-campaign-popup-close]');

@@ -209,6 +209,8 @@ final class QuoteController extends Controller
             'issue_date' => trim((string) ($_POST['issue_date'] ?? '')),
             'valid_until' => trim((string) ($_POST['valid_until'] ?? '')),
             'currency' => 'CLP',
+            'discount_type' => in_array(($_POST['discount_type'] ?? ''), ['percentage', 'fixed'], true) ? (string) $_POST['discount_type'] : 'percentage',
+            'discount_value' => $this->decimal($_POST['discount_value'] ?? 0),
             'tax_rate' => $this->decimal($_POST['tax_rate'] ?? 19),
             'notes' => trim((string) ($_POST['notes'] ?? '')) ?: null,
             'terms' => trim((string) ($_POST['terms'] ?? '')) ?: null,
@@ -226,6 +228,8 @@ final class QuoteController extends Controller
         if (!$this->validDate($data['issue_date']) || !$this->validDate($data['valid_until'])) $errors[] = 'Ingrese fechas válidas.';
         if ($this->validDate($data['issue_date']) && $this->validDate($data['valid_until']) && $data['valid_until'] < $data['issue_date']) $errors[] = 'La vigencia no puede terminar antes de la fecha de emisión.';
         if ($data['tax_rate'] < 0 || $data['tax_rate'] > 100) $errors[] = 'La tasa de impuesto debe estar entre 0 y 100.';
+        if ($data['discount_value'] < 0) $errors[] = 'El descuento no puede ser negativo.';
+        if ($data['discount_type'] === 'percentage' && $data['discount_value'] > 100) $errors[] = 'El descuento porcentual no puede superar el 100%.';
 
         $descriptions = (array) ($_POST['item_description'] ?? []);
         $details = (array) ($_POST['item_detail'] ?? []);
@@ -250,10 +254,17 @@ final class QuoteController extends Controller
         }
         if (!$items) $errors[] = 'Agregue al menos una partida a la cotización.';
         $subtotal = array_sum(array_column($items, 'total'));
-        $taxAmount = round($subtotal * ($data['tax_rate'] / 100), 2);
+        if ($data['discount_type'] === 'fixed' && $data['discount_value'] > $subtotal) $errors[] = 'El descuento fijo no puede superar el subtotal.';
+        $discountAmount = $data['discount_type'] === 'percentage'
+            ? round($subtotal * ($data['discount_value'] / 100), 2)
+            : round($data['discount_value'], 2);
+        $discountAmount = min(max($discountAmount, 0), $subtotal);
+        $taxableAmount = max(0, $subtotal - $discountAmount);
+        $taxAmount = round($taxableAmount * ($data['tax_rate'] / 100), 2);
         $data['subtotal'] = $subtotal;
+        $data['discount_amount'] = $discountAmount;
         $data['tax_amount'] = $taxAmount;
-        $data['total'] = $subtotal + $taxAmount;
+        $data['total'] = $taxableAmount + $taxAmount;
         return [$data, $items, array_values(array_unique($errors))];
     }
 

@@ -6,7 +6,7 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
         </button>
         <a class="campaign-popup__link" href="<?= url('/contacto') ?>" aria-label="Ir al formulario de contacto para implementar el DS N°44" data-campaign-popup-contact>
-            <img src="<?= asset('assets/images/popup-ds44-prevcapital-v2.webp') ?>" width="1100" height="1100" alt="Implementación del DS N°44 para empresas. Solicite una evaluación preventiva." decoding="async">
+            <img src="<?= asset('assets/images/popup-ds44-prevcapital-v3.webp') ?>" width="1254" height="1254" alt="El DS N°44 es obligatorio para todas las empresas. Impleméntelo con PrevCapital y evite multas." decoding="async">
         </a>
         <p class="campaign-popup__hint">Seleccione la imagen para solicitar una evaluación.</p>
     </section>

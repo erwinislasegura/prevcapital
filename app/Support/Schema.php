@@ -40,6 +40,15 @@ final class Schema
         if (!self::constraintExists('quotes', 'fk_quotes_client')) {
             $pdo->exec('ALTER TABLE quotes ADD CONSTRAINT fk_quotes_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL');
         }
+        if (!self::columnExists('quotes', 'discount_type')) {
+            $pdo->exec("ALTER TABLE quotes ADD COLUMN discount_type ENUM('percentage','fixed') NOT NULL DEFAULT 'percentage' AFTER subtotal");
+        }
+        if (!self::columnExists('quotes', 'discount_value')) {
+            $pdo->exec('ALTER TABLE quotes ADD COLUMN discount_value DECIMAL(14,2) NOT NULL DEFAULT 0 AFTER discount_type');
+        }
+        if (!self::columnExists('quotes', 'discount_amount')) {
+            $pdo->exec('ALTER TABLE quotes ADD COLUMN discount_amount DECIMAL(14,2) NOT NULL DEFAULT 0 AFTER discount_value');
+        }
     }
 
     private static function columnExists(string $table, string $column): bool

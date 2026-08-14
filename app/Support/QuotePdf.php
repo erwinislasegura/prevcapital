@@ -83,14 +83,25 @@ final class QuotePdf
         if ($page === $totalPages) {
             $y -= 8;
             $totalsY = max(190, $y - 10);
-            self::rect($out, 357, $totalsY - 88, 200, 98, self::LIGHT);
+            $hasDiscount = (float) ($quote['discount_amount'] ?? 0) > 0;
+            self::rect($out, 357, $totalsY - ($hasDiscount ? 112 : 88), 200, $hasDiscount ? 122 : 98, self::LIGHT);
             self::text($out, 373, $totalsY - 12, 'Subtotal', 9, false, self::MUTED);
             self::text($out, 541, $totalsY - 12, self::money($quote['subtotal'] ?? 0), 9, true, self::TEXT, 'right');
-            self::text($out, 373, $totalsY - 35, 'IVA ' . self::quantity($quote['tax_rate'] ?? 19) . '%', 9, false, self::MUTED);
-            self::text($out, 541, $totalsY - 35, self::money($quote['tax_amount'] ?? 0), 9, true, self::TEXT, 'right');
-            self::line($out, 373, $totalsY - 51, 541, $totalsY - 51, self::TEAL, 1.2);
-            self::text($out, 373, $totalsY - 75, 'TOTAL', 11, true, self::NAVY);
-            self::text($out, 541, $totalsY - 75, self::money($quote['total'] ?? 0), 14, true, self::NAVY, 'right');
+            $taxOffset = 35;
+            $totalOffset = 75;
+            if ($hasDiscount) {
+                $discountLabel = 'Descuento';
+                if (($quote['discount_type'] ?? '') === 'percentage') $discountLabel .= ' ' . self::quantity($quote['discount_value'] ?? 0) . '%';
+                self::text($out, 373, $totalsY - 35, $discountLabel, 9, false, self::TEAL);
+                self::text($out, 541, $totalsY - 35, '-' . self::money($quote['discount_amount'] ?? 0), 9, true, self::TEAL, 'right');
+                $taxOffset = 58;
+                $totalOffset = 98;
+            }
+            self::text($out, 373, $totalsY - $taxOffset, 'IVA ' . self::quantity($quote['tax_rate'] ?? 19) . '%', 9, false, self::MUTED);
+            self::text($out, 541, $totalsY - $taxOffset, self::money($quote['tax_amount'] ?? 0), 9, true, self::TEXT, 'right');
+            self::line($out, 373, $totalsY - ($totalOffset - 24), 541, $totalsY - ($totalOffset - 24), self::TEAL, 1.2);
+            self::text($out, 373, $totalsY - $totalOffset, 'TOTAL', 11, true, self::NAVY);
+            self::text($out, 541, $totalsY - $totalOffset, self::money($quote['total'] ?? 0), 14, true, self::NAVY, 'right');
 
             $notes = trim((string) ($quote['notes'] ?? ''));
             $terms = trim((string) ($quote['terms'] ?? ''));
