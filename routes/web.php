@@ -12,6 +12,10 @@ use App\Core\Router;
 
 $router = new Router();
 $router->get('/', [HomeController::class, 'index']);
+$router->get('/servicios', [HomeController::class, 'services']);
+$router->get('/cumplimiento', [HomeController::class, 'compliance']);
+$router->get('/nosotros', [HomeController::class, 'about']);
+$router->get('/contacto', [HomeController::class, 'contact']);
 $router->get('/login', [AuthController::class, 'show']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout'], ['auth']);

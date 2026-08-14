@@ -1,8 +1,37 @@
 (() => {
-    const popup = document.getElementById('ds44-campaign-popup');
-    if (!popup) return;
+    const navToggle = document.querySelector('[data-nav-toggle]');
+    const siteNav = document.querySelector('[data-site-nav]');
 
-    const storageKey = 'prevcapital_ds44_popup_seen';
+    const closeNavigation = () => {
+        if (!navToggle || !siteNav) return;
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.setAttribute('aria-label', 'Abrir menú');
+        siteNav.classList.remove('is-open');
+        document.body.classList.remove('site-nav-open');
+    };
+
+    navToggle?.addEventListener('click', () => {
+        const willOpen = navToggle.getAttribute('aria-expanded') !== 'true';
+        navToggle.setAttribute('aria-expanded', String(willOpen));
+        navToggle.setAttribute('aria-label', willOpen ? 'Cerrar menú' : 'Abrir menú');
+        siteNav?.classList.toggle('is-open', willOpen);
+        document.body.classList.toggle('site-nav-open', willOpen);
+    });
+
+    siteNav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeNavigation));
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) closeNavigation();
+    });
+
+    const popup = document.getElementById('ds44-campaign-popup');
+    if (!popup) {
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') closeNavigation();
+        });
+        return;
+    }
+
+    const storageKey = 'prevcapital_ds44_popup_v2_seen';
     const closeButton = popup.querySelector('.campaign-popup__close');
     const contactLink = popup.querySelector('[data-campaign-popup-contact]');
     const closeControls = popup.querySelectorAll('[data-campaign-popup-close]');
@@ -47,6 +76,7 @@
     contactLink?.addEventListener('click', () => closePopup(false));
 
     document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeNavigation();
         if (popup.hidden) return;
         if (event.key === 'Escape') closePopup();
         if (event.key === 'Tab') {

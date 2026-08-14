@@ -23,6 +23,10 @@ Si el proyecto se instala en una subcarpeta, las rutas y recursos la detectan au
 ## Accesos
 
 - Sitio público: `/`
+- Servicios: `/servicios`
+- Cumplimiento normativo: `/cumplimiento`
+- Nosotros y metodología: `/nosotros`
+- Contacto: `/contacto`
 - Inicio de sesión: `/login`
 - Panel administrativo: `/admin`
 - Configuración inicial: `/setup`
@@ -38,4 +42,6 @@ Si el proyecto se instala en una subcarpeta, las rutas y recursos la detectan au
 - `database/schema.sql`: esquema, roles y permisos iniciales.
 - `routes/web.php`: rutas públicas y protegidas.
 
-El sitio público conserva el diseño original de PrevCapital. Bootstrap se utiliza en el panel administrativo y formularios funcionales para mantener la portada sin alteraciones visuales.
+El sitio público conserva la identidad visual de PrevCapital. Bootstrap se utiliza únicamente en el panel administrativo y formularios funcionales, sin modificar la interfaz pública.
+
+El encabezado, pie de página, navegación, estilos y JavaScript público están centralizados. Las cinco rutas públicas reutilizan los mismos layouts y mantienen estados activos de navegación en escritorio y dispositivos móviles.
