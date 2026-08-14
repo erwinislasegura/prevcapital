@@ -7,7 +7,7 @@
     <div class="col-md-6 col-xl-3"><article><div class="metric-icon metric-icon--teal"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 3V5Z"></path></svg></div><div><span>Contactos nuevos</span><strong><?= (int) $metrics['newContacts'] ?></strong><small>Pendientes de gestión</small></div></article></div>
     <div class="col-md-6 col-xl-3"><article><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6V3Z"></path></svg></div><div><span>Cotizaciones</span><strong><?= (int) $metrics['quotes'] ?></strong><small>Propuestas creadas</small></div></article></div>
     <div class="col-md-6 col-xl-3"><article><div class="metric-icon metric-icon--teal"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg></div><div><span>Aceptadas</span><strong><?= (int) $metrics['acceptedQuotes'] ?></strong><small>Confirmadas por clientes</small></div></article></div>
-    <div class="col-md-6 col-xl-3"><article><div class="metric-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3 19c.4-4 2.4-6 6-6s5.6 2 6 6"></path></svg></div><div><span>Usuarios activos</span><strong><?= (int) $metrics['activeUsers'] ?></strong><small>Con acceso habilitado</small></div></article></div>
+    <div class="col-md-6 col-xl-3"><article><div class="metric-icon"><svg viewBox="0 0 24 24"><path d="M4 20V7l8-4 8 4v13"></path><path d="M8 20v-7h8v7"></path></svg></div><div><span>Clientes activos</span><strong><?= (int) $metrics['activeClients'] ?></strong><small>Disponibles para cotizar</small></div></article></div>
 </div>
 
 <div class="row g-4 mt-1">

@@ -30,6 +30,7 @@ Si el proyecto se instala en una subcarpeta, las rutas y recursos la detectan au
 - Inicio de sesión: `/login`
 - Panel administrativo: `/admin`
 - Solicitudes de contacto: `/admin/contactos`
+- Clientes: `/admin/clientes`
 - Cotizaciones: `/admin/cotizaciones`
 - Configuración inicial: `/setup`
 
@@ -48,6 +49,7 @@ Si no se definen, se utiliza `contacto@prevcapital.cl`. Cada envío incluye el P
 
 - El formulario público guarda cada solicitud en MySQL y permite gestionarla como nueva, contactada o cerrada.
 - Las cotizaciones admiten partidas, cálculo de IVA y total, PDF A4 corporativo, envío inmediato o posterior, vista web y respuesta de aceptación/rechazo.
+- La cartera de clientes permite guardar datos comerciales, reutilizarlos mediante un selector en cotizaciones y crear un cliente directamente desde una propuesta existente.
 - Las acciones relevantes se incorporan a la trazabilidad del panel.
 
 ## Estructura

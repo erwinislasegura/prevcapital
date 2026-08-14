@@ -24,5 +24,48 @@ final class Schema
                 Database::connection()->exec($statement);
             }
         }
+
+        self::upgradeExistingInstallations();
+    }
+
+    private static function upgradeExistingInstallations(): void
+    {
+        $pdo = Database::connection();
+        if (!self::columnExists('quotes', 'client_id')) {
+            $pdo->exec('ALTER TABLE quotes ADD COLUMN client_id BIGINT UNSIGNED NULL AFTER public_token');
+        }
+        if (!self::indexExists('quotes', 'idx_quotes_client_id')) {
+            $pdo->exec('ALTER TABLE quotes ADD INDEX idx_quotes_client_id (client_id)');
+        }
+        if (!self::constraintExists('quotes', 'fk_quotes_client')) {
+            $pdo->exec('ALTER TABLE quotes ADD CONSTRAINT fk_quotes_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE SET NULL');
+        }
+    }
+
+    private static function columnExists(string $table, string $column): bool
+    {
+        $statement = Database::connection()->prepare(
+            'SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table AND COLUMN_NAME = :column'
+        );
+        $statement->execute(['table' => $table, 'column' => $column]);
+        return (int) $statement->fetchColumn() > 0;
+    }
+
+    private static function indexExists(string $table, string $index): bool
+    {
+        $statement = Database::connection()->prepare(
+            'SELECT COUNT(*) FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table AND INDEX_NAME = :index_name'
+        );
+        $statement->execute(['table' => $table, 'index_name' => $index]);
+        return (int) $statement->fetchColumn() > 0;
+    }
+
+    private static function constraintExists(string $table, string $constraint): bool
+    {
+        $statement = Database::connection()->prepare(
+            'SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = :table AND CONSTRAINT_NAME = :constraint_name'
+        );
+        $statement->execute(['table' => $table, 'constraint_name' => $constraint]);
+        return (int) $statement->fetchColumn() > 0;
     }
 }

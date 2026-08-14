@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Csrf;
 use App\Models\AuditLog;
+use App\Models\Client;
 use App\Models\Quote;
 use App\Support\Mailer;
 use App\Support\QuotePdf;
@@ -28,9 +29,13 @@ final class QuoteController extends Controller
 
     public function create(): void
     {
+        $preselectedClient = Client::find((int) ($_GET['client_id'] ?? 0));
+        if ($preselectedClient && (int) $preselectedClient['status'] !== 1) $preselectedClient = null;
         $this->render('admin/quotes/form', [
             'pageTitle' => 'Nueva cotización',
             'quote' => null,
+            'clients' => Client::active(),
+            'preselectedClient' => $preselectedClient,
             'defaultTerms' => 'Valores expresados en pesos chilenos. Vigencia según fecha indicada. El inicio del servicio se coordina una vez aceptada la propuesta.',
         ]);
     }
@@ -40,8 +45,10 @@ final class QuoteController extends Controller
         $this->validateCsrf('/admin/cotizaciones/crear');
         [$data, $items, $errors] = $this->validatedData();
         if ($errors) $this->validationRedirect('/admin/cotizaciones/crear', $errors);
+        $createdClientId = $this->createClientFromDataWhenRequested($data);
         $id = Quote::create($data, $items, Auth::id());
         AuditLog::record('quotes.created', 'quote', $id, 'Cotización creada.');
+        if ($createdClientId !== null) AuditLog::record('clients.created_from_quote', 'client', $createdClientId, 'Cliente creado junto con la cotización ' . $id . '.');
         $sendNow = isset($_POST['send_now']);
         if ($sendNow) {
             $this->sendQuote($id, '/admin/cotizaciones/ver?id=' . $id);
@@ -63,7 +70,13 @@ final class QuoteController extends Controller
             flash('error', 'Una cotización respondida no puede ser modificada.');
             $this->redirect('/admin/cotizaciones/ver?id=' . $quote['id']);
         }
-        $this->render('admin/quotes/form', ['pageTitle' => 'Editar ' . $quote['quote_number'], 'quote' => $quote, 'defaultTerms' => '']);
+        $this->render('admin/quotes/form', [
+            'pageTitle' => 'Editar ' . $quote['quote_number'],
+            'quote' => $quote,
+            'clients' => Client::all(),
+            'preselectedClient' => null,
+            'defaultTerms' => '',
+        ]);
     }
 
     public function update(): void
@@ -78,8 +91,10 @@ final class QuoteController extends Controller
         $this->validateCsrf('/admin/cotizaciones/editar?id=' . $id);
         [$data, $items, $errors] = $this->validatedData();
         if ($errors) $this->validationRedirect('/admin/cotizaciones/editar?id=' . $id, $errors);
+        $createdClientId = $this->createClientFromDataWhenRequested($data);
         Quote::update($id, $data, $items, Auth::id());
         AuditLog::record('quotes.updated', 'quote', $id, 'Cotización actualizada.');
+        if ($createdClientId !== null) AuditLog::record('clients.created_from_quote', 'client', $createdClientId, 'Cliente creado desde la cotización ' . $id . '.');
         flash('success', 'Cotización actualizada correctamente.');
         $this->redirect('/admin/cotizaciones/ver?id=' . $id);
     }
@@ -99,6 +114,43 @@ final class QuoteController extends Controller
         $this->validateCsrf('/admin/cotizaciones');
         $id = (int) ($_POST['id'] ?? 0);
         $this->sendQuote($id, '/admin/cotizaciones/ver?id=' . $id);
+        $this->redirect('/admin/cotizaciones/ver?id=' . $id);
+    }
+
+    public function createClient(): void
+    {
+        $this->validateCsrf('/admin/cotizaciones');
+        $id = (int) ($_POST['id'] ?? 0);
+        $quote = Quote::find($id);
+        if (!$quote) {
+            flash('error', 'La cotización indicada no existe.');
+            $this->redirect('/admin/cotizaciones');
+        }
+        if (!empty($quote['client_id'])) {
+            flash('error', 'Esta cotización ya está vinculada a un cliente guardado.');
+            $this->redirect('/admin/cotizaciones/ver?id=' . $id);
+        }
+        $existing = Client::findMatching((string) $quote['email'], (string) $quote['company']);
+        if ($existing) {
+            $clientId = (int) $existing['id'];
+            $message = 'La cotización fue vinculada al cliente existente.';
+        } else {
+            $clientId = Client::create([
+                'name' => $quote['client_name'],
+                'company' => $quote['company'],
+                'email' => $quote['email'],
+                'phone' => $quote['phone'],
+                'tax_id' => $quote['tax_id'],
+                'address' => $quote['address'],
+                'notes' => 'Cliente creado desde la cotización ' . $quote['quote_number'] . '.',
+                'status' => 1,
+            ], Auth::id());
+            AuditLog::record('clients.created_from_quote', 'client', $clientId, 'Cliente creado desde ' . $quote['quote_number'] . '.');
+            $message = 'Cliente creado y disponible para futuras cotizaciones.';
+        }
+        Quote::attachClient($id, $clientId, Auth::id());
+        AuditLog::record('quotes.client_attached', 'quote', $id, 'Cotización vinculada al cliente ' . $clientId . '.');
+        flash('success', $message);
         $this->redirect('/admin/cotizaciones/ver?id=' . $id);
     }
 
@@ -146,6 +198,7 @@ final class QuoteController extends Controller
     private function validatedData(): array
     {
         $data = [
+            'client_id' => null,
             'client_name' => trim((string) ($_POST['client_name'] ?? '')),
             'company' => trim((string) ($_POST['company'] ?? '')),
             'email' => mb_strtolower(trim((string) ($_POST['email'] ?? ''))),
@@ -161,6 +214,11 @@ final class QuoteController extends Controller
             'terms' => trim((string) ($_POST['terms'] ?? '')) ?: null,
         ];
         $errors = [];
+        $clientId = (int) ($_POST['client_id'] ?? 0);
+        if ($clientId > 0) {
+            if (Client::find($clientId)) $data['client_id'] = $clientId;
+            else $errors[] = 'El cliente seleccionado ya no existe.';
+        }
         if (mb_strlen($data['client_name']) < 3 || mb_strlen($data['client_name']) > 140) $errors[] = 'Ingrese el nombre del contacto.';
         if (mb_strlen($data['company']) < 2 || mb_strlen($data['company']) > 160) $errors[] = 'Ingrese la empresa del cliente.';
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) $errors[] = 'Ingrese un correo electrónico válido.';
@@ -197,6 +255,28 @@ final class QuoteController extends Controller
         $data['tax_amount'] = $taxAmount;
         $data['total'] = $subtotal + $taxAmount;
         return [$data, $items, array_values(array_unique($errors))];
+    }
+
+    private function createClientFromDataWhenRequested(array &$data): ?int
+    {
+        if (!isset($_POST['save_client']) || !Auth::can('clients.create') || $data['client_id'] !== null) return null;
+        $existing = Client::findMatching((string) $data['email'], (string) $data['company']);
+        if ($existing) {
+            $data['client_id'] = (int) $existing['id'];
+            return null;
+        }
+        $clientId = Client::create([
+            'name' => $data['client_name'],
+            'company' => $data['company'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'tax_id' => $data['tax_id'],
+            'address' => $data['address'],
+            'notes' => 'Cliente creado al guardar una cotización.',
+            'status' => 1,
+        ], Auth::id());
+        $data['client_id'] = $clientId;
+        return $clientId;
     }
 
     private function decimal(mixed $value): float

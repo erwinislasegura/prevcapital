@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Controllers\AuthController;
+use App\Controllers\ClientController;
 use App\Controllers\ContactController;
 use App\Controllers\DashboardController;
 use App\Controllers\HomeController;
@@ -50,6 +51,13 @@ $router->get('/admin/contactos/ver', [ContactController::class, 'show'], ['auth'
 $router->post('/admin/contactos/estado', [ContactController::class, 'status'], ['auth', 'permission:contacts.manage']);
 $router->post('/admin/contactos/eliminar', [ContactController::class, 'delete'], ['auth', 'permission:contacts.delete']);
 
+$router->get('/admin/clientes', [ClientController::class, 'index'], ['auth', 'permission:clients.view']);
+$router->get('/admin/clientes/crear', [ClientController::class, 'create'], ['auth', 'permission:clients.create']);
+$router->post('/admin/clientes/crear', [ClientController::class, 'store'], ['auth', 'permission:clients.create']);
+$router->get('/admin/clientes/editar', [ClientController::class, 'edit'], ['auth', 'permission:clients.edit']);
+$router->post('/admin/clientes/editar', [ClientController::class, 'update'], ['auth', 'permission:clients.edit']);
+$router->post('/admin/clientes/eliminar', [ClientController::class, 'delete'], ['auth', 'permission:clients.delete']);
+
 $router->get('/admin/cotizaciones', [QuoteController::class, 'index'], ['auth', 'permission:quotes.view']);
 $router->get('/admin/cotizaciones/crear', [QuoteController::class, 'create'], ['auth', 'permission:quotes.create']);
 $router->post('/admin/cotizaciones/crear', [QuoteController::class, 'store'], ['auth', 'permission:quotes.create']);
@@ -58,6 +66,7 @@ $router->get('/admin/cotizaciones/editar', [QuoteController::class, 'edit'], ['a
 $router->post('/admin/cotizaciones/editar', [QuoteController::class, 'update'], ['auth', 'permission:quotes.edit']);
 $router->get('/admin/cotizaciones/pdf', [QuoteController::class, 'pdf'], ['auth', 'permission:quotes.view']);
 $router->post('/admin/cotizaciones/enviar', [QuoteController::class, 'send'], ['auth', 'permission:quotes.send']);
+$router->post('/admin/cotizaciones/crear-cliente', [QuoteController::class, 'createClient'], ['auth', 'permission:clients.create']);
 $router->post('/admin/cotizaciones/eliminar', [QuoteController::class, 'delete'], ['auth', 'permission:quotes.delete']);
 
 return $router;

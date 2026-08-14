@@ -13,6 +13,11 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v12H8l-4 3V5Z"></path><path d="M8 9h8M8 13h5"></path></svg><span>Contactos</span>
     </a>
     <?php endif; ?>
+    <?php if (\App\Core\Auth::can('clients.view')): ?>
+    <a class="<?= $isClients ? 'active' : '' ?>" href="<?= url('/admin/clientes') ?>">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V7l8-4 8 4v13"></path><path d="M8 20v-7h8v7M9 9h.01M15 9h.01"></path></svg><span>Clientes</span>
+    </a>
+    <?php endif; ?>
     <?php if (\App\Core\Auth::can('quotes.view')): ?>
     <a class="<?= $isQuotes ? 'active' : '' ?>" href="<?= url('/admin/cotizaciones') ?>">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6V3Z"></path><path d="M14 3v4h4M9 11h6M9 15h6"></path></svg><span>Cotizaciones</span>

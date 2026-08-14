@@ -6,7 +6,8 @@ $isUsers = str_contains($requestPath, '/admin/users');
 $isRoles = str_contains($requestPath, '/admin/roles');
 $isContacts = str_contains($requestPath, '/admin/contactos');
 $isQuotes = str_contains($requestPath, '/admin/cotizaciones');
-$isDashboard = !$isUsers && !$isRoles && !$isContacts && !$isQuotes;
+$isClients = str_contains($requestPath, '/admin/clientes');
+$isDashboard = !$isUsers && !$isRoles && !$isContacts && !$isQuotes && !$isClients;
 ?>
 <!doctype html>
 <html lang="es">
