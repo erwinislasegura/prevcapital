@@ -49,6 +49,9 @@ final class Schema
         if (!self::columnExists('quotes', 'discount_amount')) {
             $pdo->exec('ALTER TABLE quotes ADD COLUMN discount_amount DECIMAL(14,2) NOT NULL DEFAULT 0 AFTER discount_value');
         }
+        if (!self::columnExists('contact_inquiries', 'worker_count')) {
+            $pdo->exec('ALTER TABLE contact_inquiries ADD COLUMN worker_count INT UNSIGNED NULL AFTER phone');
+        }
     }
 
     private static function columnExists(string $table, string $column): bool

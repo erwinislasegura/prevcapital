@@ -47,7 +47,15 @@ Si no se definen, se utiliza `contacto@prevcapital.cl`. Cada envío incluye el P
 
 ## Contacto y redes del encabezado
 
-El correo visible en la franja superior se configura con `CONTACT_EMAIL`. Los perfiles sociales se habilitan al definir sus URL completas:
+Los datos visibles en la franja superior, página de contacto y pie de página se configuran con:
+
+- `CONTACT_EMAIL`
+- `CONTACT_PHONE_PRIMARY`
+- `CONTACT_PHONE_SECONDARY`
+- `CONTACT_LOCATION`
+- `CONTACT_COVERAGE`
+
+Los perfiles sociales se habilitan al definir sus URL completas:
 
 - `SOCIAL_INSTAGRAM_URL`
 - `SOCIAL_FACEBOOK_URL`
@@ -57,7 +65,7 @@ Mientras una URL no esté configurada, el icono permanece visible en estado inac
 
 ## Módulos comerciales
 
-- El formulario público guarda cada solicitud en MySQL y permite gestionarla como nueva, contactada o cerrada.
+- El formulario público guarda cada solicitud —incluida la dotación de trabajadores— en MySQL y permite gestionarla como nueva, contactada o cerrada.
 - Las cotizaciones admiten partidas, descuento porcentual o fijo, cálculo de IVA sobre el neto, PDF A4 corporativo, envío inmediato o posterior, vista web y respuesta de aceptación/rechazo.
 - La cartera de clientes permite guardar datos comerciales, reutilizarlos mediante un selector en cotizaciones y crear un cliente directamente desde una propuesta existente.
 - Las acciones relevantes se incorporan a la trazabilidad del panel.

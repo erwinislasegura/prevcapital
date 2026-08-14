@@ -1,3 +1,12 @@
+<?php
+$contactData = (array) \App\Core\Config::get('app.contact', []);
+$contactEmail = (string) ($contactData['email'] ?? 'contacto@prevcapital.cl');
+$primaryPhone = (string) ($contactData['phone_primary'] ?? '+56 9 6418 0365');
+$secondaryPhone = (string) ($contactData['phone_secondary'] ?? '+56 9 8597 4082');
+$contactLocation = (string) ($contactData['location'] ?? 'La Serena, Chile');
+$contactCoverage = (string) ($contactData['coverage'] ?? 'Región de Coquimbo, Chile');
+$phoneHref = static fn (string $phone): string => preg_replace('/[^+\d]/', '', $phone) ?: '';
+?>
 <section class="page-hero page-hero--contact">
     <div class="page-hero__overlay"></div>
     <div class="container page-hero__content">
@@ -15,9 +24,9 @@
             <h2>Identifique hoy las brechas que mañana pueden detener su operación.</h2>
             <p>Una conversación inicial nos permite comprender el contexto, revisar la urgencia y orientar la solución más adecuada.</p>
             <div class="contact-points">
-                <article><span>01</span><div><strong>Respuesta orientada a empresas</strong><p>Analizamos su necesidad desde la realidad de la operación.</p></div></article>
-                <article><span>02</span><div><strong>Alcance definido con claridad</strong><p>Servicios, entregables, etapas y prioridades identificadas.</p></div></article>
-                <article><span>03</span><div><strong>Atención en Chile</strong><p>Proyectos preventivos para organizaciones de distintos sectores.</p></div></article>
+                <article><span>01</span><div><strong>Correo</strong><p><a href="mailto:<?= e($contactEmail) ?>"><?= e($contactEmail) ?></a></p></div></article>
+                <article><span>02</span><div><strong>Teléfonos</strong><p><a href="tel:<?= e($phoneHref($primaryPhone)) ?>"><?= e($primaryPhone) ?></a> · <a href="tel:<?= e($phoneHref($secondaryPhone)) ?>"><?= e($secondaryPhone) ?></a></p></div></article>
+                <article><span>03</span><div><strong><?= e($contactLocation) ?></strong><p>Cobertura <?= e($contactCoverage) ?></p></div></article>
             </div>
         </div>
         <div class="contact__panel">
@@ -28,15 +37,14 @@
             <?php if ($errors = flash('errors')): ?><div class="form-notice form-notice--error" role="alert"><ul><?php foreach ($errors as $error): ?><li><?= e($error) ?></li><?php endforeach; ?></ul></div><?php endif; ?>
             <form action="<?= url('/contacto') ?>" method="post">
                 <?= csrf_field() ?>
-                <label class="form-honeypot" aria-hidden="true">Sitio web<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
                 <label>Nombre y apellido<input type="text" placeholder="Ej. Carolina Muñoz" required maxlength="140" name="nombre" autocomplete="name" value="<?= e(old('nombre')) ?>"></label>
                 <label>Empresa<input type="text" placeholder="Nombre de la organización" required maxlength="160" name="empresa" autocomplete="organization" value="<?= e(old('empresa')) ?>"></label>
                 <div><label>Correo corporativo<input type="email" placeholder="nombre@empresa.cl" required maxlength="180" name="correo" autocomplete="email" inputmode="email" value="<?= e(old('correo')) ?>"></label><label><span>Teléfono <small>(opcional)</small></span><input type="tel" placeholder="+56 9..." maxlength="60" name="telefono" autocomplete="tel" inputmode="tel" value="<?= e(old('telefono')) ?>"></label></div>
-                <label>¿Qué necesita resolver?<select name="servicio" required><option value="" disabled <?= old('servicio') ? '' : 'selected' ?>>Seleccione un servicio</option><?php foreach (['Diagnóstico preventivo','Implementación DS N°44','Protocolos MINSAL','Carpeta de arranque minería','ISO 45001','Capacitaciones','Otro requerimiento'] as $service): ?><option <?= selected(old('servicio'), $service) ?>><?= e($service) ?></option><?php endforeach; ?></select></label>
+                <div class="contact-form__need"><label>N.º de trabajadores<input type="number" min="1" max="1000000" step="1" inputmode="numeric" placeholder="Ej. 25" required name="numero_trabajadores" value="<?= e(old('numero_trabajadores')) ?>"></label><label>¿Qué necesita resolver?<select name="servicio" required><option value="" disabled <?= old('servicio') ? '' : 'selected' ?>>Seleccione un servicio</option><?php foreach (['Diagnóstico preventivo','Implementación DS N°44','Protocolos MINSAL','Carpeta de arranque minería','ISO 45001','Capacitaciones','Otro requerimiento'] as $service): ?><option <?= selected(old('servicio'), $service) ?>><?= e($service) ?></option><?php endforeach; ?></select></label></div>
                 <label><span>Cuéntenos brevemente <small>(opcional)</small></span><textarea name="mensaje" placeholder="Describa la necesidad de su empresa" rows="4" maxlength="3000"><?= e(old('mensaje')) ?></textarea></label>
                 <button class="button button--primary button--full" type="submit">Solicitar contacto <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
             </form>
-            <small>Atención a empresas y organizaciones en Chile</small>
+            <small>Atención en <?= e($contactLocation) ?> · Cobertura <?= e($contactCoverage) ?></small>
         </div>
     </div>
 </section>

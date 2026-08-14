@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS contact_inquiries (
     company VARCHAR(160) NOT NULL,
     email VARCHAR(180) NOT NULL,
     phone VARCHAR(60) NULL,
+    worker_count INT UNSIGNED NULL,
     service VARCHAR(140) NOT NULL,
     message TEXT NULL,
     status ENUM('new','contacted','closed') NOT NULL DEFAULT 'new',

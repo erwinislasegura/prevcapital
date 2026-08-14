@@ -16,7 +16,7 @@ final class HomeController extends Controller
         $this->renderPage(
             'site/home',
             'PrevCapital Empresas | Seguridad y Salud en el Trabajo',
-            'Consultoría estratégica en prevención de riesgos, implementación DS N°44, protocolos MINSAL, carpetas de arranque e ISO 45001 para empresas.',
+            'Asesoría preventiva y blindaje legal para evitar demandas, indemnizaciones y riesgos que afectan la continuidad de su empresa.',
             'inicio',
             ['showCampaignPopup' => true]
         );
@@ -68,10 +68,6 @@ final class HomeController extends Controller
             flash('error', 'La sesión expiró. Actualice la página e intente nuevamente.');
             $this->redirect('/contacto#contacto');
         }
-        if (trim((string) ($_POST['website'] ?? '')) !== '') {
-            flash('success', 'Gracias. Recibimos su solicitud y nos pondremos en contacto.');
-            $this->redirect('/contacto#contacto');
-        }
         $now = time();
         $attempts = array_values(array_filter((array) ($_SESSION['contact_attempts'] ?? []), static fn ($time): bool => (int) $time > $now - 600));
         if (count($attempts) >= 3) {
@@ -83,6 +79,7 @@ final class HomeController extends Controller
             'company' => trim((string) ($_POST['empresa'] ?? '')),
             'email' => mb_strtolower(trim((string) ($_POST['correo'] ?? ''))),
             'phone' => trim((string) ($_POST['telefono'] ?? '')) ?: null,
+            'worker_count' => (int) ($_POST['numero_trabajadores'] ?? 0),
             'service' => trim((string) ($_POST['servicio'] ?? '')),
             'message' => trim((string) ($_POST['mensaje'] ?? '')) ?: null,
             'source' => 'Formulario web',
@@ -93,6 +90,7 @@ final class HomeController extends Controller
         if (mb_strlen($data['name']) < 3 || mb_strlen($data['name']) > 140) $errors[] = 'Ingrese un nombre válido.';
         if (mb_strlen($data['company']) < 2 || mb_strlen($data['company']) > 160) $errors[] = 'Ingrese el nombre de la empresa.';
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL) || mb_strlen($data['email']) > 180) $errors[] = 'Ingrese un correo electrónico válido.';
+        if ($data['worker_count'] < 1 || $data['worker_count'] > 1000000) $errors[] = 'Ingrese un número de trabajadores válido.';
         if ($data['service'] === '' || mb_strlen($data['service']) > 140) $errors[] = 'Seleccione el servicio que necesita.';
         if ($data['message'] !== null && mb_strlen($data['message']) > 3000) $errors[] = 'El mensaje no puede superar los 3.000 caracteres.';
         if ($errors) {

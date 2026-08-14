@@ -11,8 +11,8 @@ final class ContactInquiry
     public static function create(array $data): int
     {
         $statement = Database::connection()->prepare(
-            'INSERT INTO contact_inquiries (name, company, email, phone, service, message, source, ip_address, user_agent)
-             VALUES (:name, :company, :email, :phone, :service, :message, :source, :ip_address, :user_agent)'
+            'INSERT INTO contact_inquiries (name, company, email, phone, worker_count, service, message, source, ip_address, user_agent)
+             VALUES (:name, :company, :email, :phone, :worker_count, :service, :message, :source, :ip_address, :user_agent)'
         );
         $statement->execute($data);
         return (int) Database::connection()->lastInsertId();

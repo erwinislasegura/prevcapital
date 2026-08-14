@@ -1,3 +1,12 @@
+<?php
+$footerContact = (array) \App\Core\Config::get('app.contact', []);
+$footerEmail = (string) ($footerContact['email'] ?? 'contacto@prevcapital.cl');
+$footerPhonePrimary = (string) ($footerContact['phone_primary'] ?? '+56 9 6418 0365');
+$footerPhoneSecondary = (string) ($footerContact['phone_secondary'] ?? '+56 9 8597 4082');
+$footerLocation = (string) ($footerContact['location'] ?? 'La Serena, Chile');
+$footerCoverage = (string) ($footerContact['coverage'] ?? 'Región de Coquimbo, Chile');
+$footerPhoneHref = static fn (string $phone): string => preg_replace('/[^+\d]/', '', $phone) ?: '';
+?>
 <footer>
     <div class="container footer__main">
         <div class="footer__brand">
@@ -19,6 +28,13 @@
             <span>ISO 45001</span>
             <span>Carpetas de arranque</span>
         </div>
+        <div class="footer__contact">
+            <strong>Contacto</strong>
+            <a href="mailto:<?= e($footerEmail) ?>"><?= e($footerEmail) ?></a>
+            <div class="footer__phones"><a href="tel:<?= e($footerPhoneHref($footerPhonePrimary)) ?>"><?= e($footerPhonePrimary) ?></a><span>/</span><a href="tel:<?= e($footerPhoneHref($footerPhoneSecondary)) ?>"><?= e($footerPhoneSecondary) ?></a></div>
+            <span><?= e($footerLocation) ?></span>
+            <span>Cobertura <?= e($footerCoverage) ?></span>
+        </div>
         <div>
             <strong>Gestión</strong>
             <a class="footer__admin" href="<?= url('/admin') ?>">
@@ -29,6 +45,6 @@
     </div>
     <div class="container footer__bottom">
         <span>© 2026 PrevCapital. Todos los derechos reservados.</span>
-        <span>Consultoría en prevención de riesgos · Chile</span>
+        <span><?= e($footerLocation) ?> · Cobertura <?= e($footerCoverage) ?></span>
     </div>
 </footer>

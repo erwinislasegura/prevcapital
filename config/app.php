@@ -10,6 +10,10 @@ return [
     'timezone' => getenv('APP_TIMEZONE') ?: 'America/Santiago',
     'contact' => [
         'email' => getenv('CONTACT_EMAIL') ?: 'contacto@prevcapital.cl',
+        'phone_primary' => getenv('CONTACT_PHONE_PRIMARY') ?: '+56 9 6418 0365',
+        'phone_secondary' => getenv('CONTACT_PHONE_SECONDARY') ?: '+56 9 8597 4082',
+        'location' => getenv('CONTACT_LOCATION') ?: 'La Serena, Chile',
+        'coverage' => getenv('CONTACT_COVERAGE') ?: 'Región de Coquimbo, Chile',
     ],
     'social' => [
         'instagram' => getenv('SOCIAL_INSTAGRAM_URL') ?: '',

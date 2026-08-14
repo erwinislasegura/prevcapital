@@ -3,8 +3,8 @@
     <div class="hero__shade"></div>
     <div class="container hero__content">
         <p class="eyebrow"><span>Prevención estratégica</span> Continuidad operacional</p>
-        <h1 id="hero-title">Seguridad que protege a su equipo y a su empresa.</h1>
-        <p class="hero__lead">Transformamos el cumplimiento en Seguridad y Salud en el Trabajo en una herramienta de protección legal, control operacional y cuidado real de las personas.</p>
+        <h1 id="hero-title">¿Prefiere invertir hoy en una asesoría preventiva o gastar <strong>diez veces más</strong> mañana en abogados para defenderse de un juicio laboral?</h1>
+        <p class="hero__lead">Evite indemnizaciones millonarias cuidando a su equipo con un blindaje legal que previene demandas y asegura la tranquilidad de su negocio.</p>
         <div class="hero__actions">
             <a class="button button--primary" href="<?= url('/contacto') ?>">Solicitar evaluación <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
             <a class="text-link" href="<?= url('/servicios') ?>">Conocer servicios <span>→</span></a>
