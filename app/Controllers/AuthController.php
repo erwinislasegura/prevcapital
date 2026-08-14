@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Csrf;
 use App\Models\AuditLog;
+use App\Support\Schema;
 
 final class AuthController extends Controller
 {
@@ -29,6 +30,7 @@ final class AuthController extends Controller
         $password = (string) ($_POST['password'] ?? '');
 
         try {
+            Schema::install();
             if (!Auth::attempt($email, $password)) {
                 flash('error', 'Correo o contraseña incorrectos, o usuario inactivo.');
                 flash('old', ['email' => $email]);

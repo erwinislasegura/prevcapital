@@ -480,3 +480,31 @@ footer { background:#050e15; color:#81929b; }
 @media (prefers-reduced-motion:reduce) {
   .campaign-popup,.campaign-popup__dialog,.campaign-popup__close { transition:none; }
 }
+.form-honeypot { position:absolute!important; left:-9999px!important; width:1px!important; height:1px!important; overflow:hidden!important; }
+.form-notice { margin:0 0 18px; padding:13px 15px; border-left:4px solid; font-size:12px; line-height:1.5; }
+.form-notice ul { margin:0; padding-left:18px; }
+.form-notice--success { background:#e5f7f4; border-color:var(--teal); color:#075c59; }
+.form-notice--error { background:#fff0f0; border-color:#bd3d3d; color:#7e2424; }
+.button--outline { border-color:#9eb0b8; background:transparent; color:var(--navy); }
+.button--outline:hover { border-color:var(--navy); }
+.web-quote-hero { padding:70px 0 75px; background:var(--navy); color:#fff; border-bottom:5px solid var(--teal); }
+.web-quote-hero p { margin:0 0 16px; color:var(--teal-light); font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+.web-quote-hero h1 { max-width:850px; margin:0; font-size:clamp(33px,4vw,48px); letter-spacing:-.035em; }
+.web-quote-hero span { display:block; margin-top:16px; color:#b7c6cd; font-size:15px; }
+.web-quote { background:#eef3f4; }
+.web-quote__layout { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:32px; align-items:start; }
+.web-quote-card { background:#fff; border:1px solid var(--line); box-shadow:0 18px 50px rgba(7,24,38,.08); }
+.web-quote-card__top { min-height:92px; padding:24px 28px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+.web-quote-card__top>div { display:flex; flex-direction:column; }
+.web-quote-card__top>div span,.web-quote-client span,.web-quote-conditions span { color:#008c89; font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+.web-quote-card__top>div strong { margin-top:7px; font-size:19px; }
+.web-status { padding:7px 10px; font-size:9px; font-weight:800; text-transform:uppercase; }
+.web-status--draft { background:#e9edef; color:#5e6c73; }.web-status--sent { background:#dff4f3; color:#076b68; }.web-status--accepted { background:#ddf4e7; color:#126a42; }.web-status--rejected { background:#f8e4e4; color:#922f2f; }
+.web-quote-client { padding:25px 28px; background:#f5f8f8; display:grid; grid-template-columns:1fr auto auto; gap:35px; }
+.web-quote-client>div { display:flex; flex-direction:column; }.web-quote-client strong { margin-top:7px; font-size:13px; }.web-quote-client p { margin:5px 0 0; color:var(--muted); font-size:11px; }
+.web-quote-table-wrap { overflow-x:auto; }.web-quote-table { width:100%; border-collapse:collapse; white-space:nowrap; font-size:12px; }.web-quote-table th { padding:13px 20px; background:#0d2534; color:#dce8ec; font-size:9px; letter-spacing:.08em; text-align:left; text-transform:uppercase; }.web-quote-table th:not(:first-child),.web-quote-table td:not(:first-child) { text-align:right; }.web-quote-table td { padding:18px 20px; border-bottom:1px solid #e5ebec; }.web-quote-table td:first-child { min-width:300px; white-space:normal; }.web-quote-table td small { display:block; margin-top:6px; color:var(--muted); line-height:1.5; }
+.web-quote-totals { width:min(330px,calc(100% - 40px)); margin:26px 20px 26px auto; padding:18px 22px; background:#eef5f5; }.web-quote-totals>div { padding:7px 0; display:flex; justify-content:space-between; color:var(--muted); font-size:12px; }.web-quote-totals>div:last-child { margin-top:7px; padding-top:16px; border-top:1px solid var(--teal); color:var(--navy); }.web-quote-totals>div:last-child strong { font-size:20px; }
+.web-quote-conditions { padding:0 28px 25px; display:grid; gap:18px; }.web-quote-conditions p { margin:7px 0 0; color:var(--muted); font-size:12px; line-height:1.65; }
+.web-quote-actions { position:sticky; top:135px; }.web-quote-actions>div { padding:28px; background:#fff; border-top:4px solid var(--teal); box-shadow:0 15px 40px rgba(7,24,38,.08); }.web-quote-actions .section-kicker { margin-bottom:13px; color:#008c89; }.web-quote-actions h2 { margin:0 0 12px; font-size:23px; line-height:1.2; }.web-quote-actions p { margin:0 0 22px; color:var(--muted); font-size:13px; line-height:1.6; }.web-quote-reject { margin-top:24px; padding-top:22px; border-top:1px solid var(--line); }.web-quote-reject label { color:#50616a; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }.web-quote-reject textarea { width:100%; margin:8px 0 10px; padding:11px; border:1px solid #c8d2d5; font:inherit; resize:vertical; }.web-pdf-link { margin-top:20px; padding-top:18px; border-top:1px solid var(--line); display:block; color:#007f7c; font-size:12px; font-weight:800; text-align:center; }.web-final-state { padding:18px; background:#edf3f4; }.web-final-state>span { width:42px; height:42px; margin-bottom:15px; display:grid; place-items:center; background:var(--navy); color:var(--teal-light); font-size:24px; }.web-final-state h2 { font-size:20px; }.web-final-state--accepted { background:#e4f5ec; }.web-final-state--rejected { background:#f8e9e9; }.web-quote-notice { margin-bottom:18px; padding:15px 18px; border-left:4px solid; font-size:13px; }.web-quote-notice--success { background:#e2f6eb; border-color:#188057; color:#126640; }.web-quote-notice--error { background:#fae8e8; border-color:#a53636; color:#842929; }
+@media(max-width:991px){.web-quote__layout{grid-template-columns:1fr}.web-quote-actions{position:static}.web-quote-client{grid-template-columns:1fr 1fr}.web-quote-client>div:first-child{grid-column:1/-1}}
+@media(max-width:575px){.web-quote-hero{padding:50px 0}.web-quote{padding:60px 0}.web-quote-card__top{padding:20px;align-items:flex-start;gap:15px}.web-quote-client{grid-template-columns:1fr;padding:20px}.web-quote-client>div:first-child{grid-column:auto}.web-quote-table th,.web-quote-table td{padding-inline:14px}.web-quote-conditions{padding-inline:20px}.web-quote-actions>div{padding:22px}.web-quote-totals{width:calc(100% - 28px);margin-inline:14px}}

@@ -58,6 +58,86 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     CONSTRAINT fk_audit_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS contact_inquiries (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(140) NOT NULL,
+    company VARCHAR(160) NOT NULL,
+    email VARCHAR(180) NOT NULL,
+    phone VARCHAR(60) NULL,
+    service VARCHAR(140) NOT NULL,
+    message TEXT NULL,
+    status ENUM('new','contacted','closed') NOT NULL DEFAULT 'new',
+    source VARCHAR(80) NOT NULL DEFAULT 'Formulario web',
+    ip_address VARCHAR(45) NULL,
+    user_agent VARCHAR(255) NULL,
+    reviewed_by INT UNSIGNED NULL,
+    reviewed_at DATETIME NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_contact_status (status),
+    INDEX idx_contact_created_at (created_at),
+    CONSTRAINT fk_contact_reviewer FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS quotes (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    quote_number VARCHAR(40) NOT NULL UNIQUE,
+    public_token CHAR(64) NOT NULL UNIQUE,
+    client_name VARCHAR(140) NOT NULL,
+    company VARCHAR(160) NOT NULL,
+    email VARCHAR(180) NOT NULL,
+    phone VARCHAR(60) NULL,
+    tax_id VARCHAR(30) NULL,
+    address VARCHAR(255) NULL,
+    subject VARCHAR(200) NOT NULL,
+    issue_date DATE NOT NULL,
+    valid_until DATE NOT NULL,
+    status ENUM('draft','sent','accepted','rejected') NOT NULL DEFAULT 'draft',
+    currency CHAR(3) NOT NULL DEFAULT 'CLP',
+    subtotal DECIMAL(14,2) NOT NULL DEFAULT 0,
+    tax_rate DECIMAL(5,2) NOT NULL DEFAULT 19,
+    tax_amount DECIMAL(14,2) NOT NULL DEFAULT 0,
+    total DECIMAL(14,2) NOT NULL DEFAULT 0,
+    notes TEXT NULL,
+    terms TEXT NULL,
+    sent_at DATETIME NULL,
+    accepted_at DATETIME NULL,
+    rejected_at DATETIME NULL,
+    rejection_reason TEXT NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_quotes_status (status),
+    INDEX idx_quotes_created_at (created_at),
+    CONSTRAINT fk_quotes_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_quotes_updater FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS quote_items (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    quote_id BIGINT UNSIGNED NOT NULL,
+    description VARCHAR(220) NOT NULL,
+    detail TEXT NULL,
+    quantity DECIMAL(12,2) NOT NULL DEFAULT 1,
+    unit_price DECIMAL(14,2) NOT NULL DEFAULT 0,
+    total DECIMAL(14,2) NOT NULL DEFAULT 0,
+    sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+    CONSTRAINT fk_quote_items_quote FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS quote_events (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    quote_id BIGINT UNSIGNED NOT NULL,
+    event_type VARCHAR(60) NOT NULL,
+    details TEXT NULL,
+    ip_address VARCHAR(45) NULL,
+    user_agent VARCHAR(255) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_quote_events_created_at (created_at),
+    CONSTRAINT fk_quote_events_quote FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT IGNORE INTO roles (name, slug, description, is_system) VALUES
 ('Superadministrador', 'superadmin', 'Acceso completo a todos los módulos y configuraciones.', 1),
 ('Administrador', 'administrador', 'Gestión operativa de usuarios y consulta de roles.', 1),
@@ -74,13 +154,23 @@ INSERT IGNORE INTO permissions (name, slug, module, description) VALUES
 ('Editar roles', 'roles.edit', 'Roles y permisos', 'Modificar roles y permisos.'),
 ('Eliminar roles', 'roles.delete', 'Roles y permisos', 'Eliminar roles no protegidos.');
 
+INSERT IGNORE INTO permissions (name, slug, module, description) VALUES
+('Ver contactos', 'contacts.view', 'Contactos', 'Consultar solicitudes recibidas desde el sitio web.'),
+('Gestionar contactos', 'contacts.manage', 'Contactos', 'Actualizar el estado de las solicitudes.'),
+('Eliminar contactos', 'contacts.delete', 'Contactos', 'Eliminar solicitudes de contacto.'),
+('Ver cotizaciones', 'quotes.view', 'Cotizaciones', 'Consultar cotizaciones y su estado.'),
+('Crear cotizaciones', 'quotes.create', 'Cotizaciones', 'Crear nuevas cotizaciones.'),
+('Editar cotizaciones', 'quotes.edit', 'Cotizaciones', 'Modificar cotizaciones existentes.'),
+('Enviar cotizaciones', 'quotes.send', 'Cotizaciones', 'Enviar cotizaciones por correo electrónico.'),
+('Eliminar cotizaciones', 'quotes.delete', 'Cotizaciones', 'Eliminar cotizaciones del sistema.');
+
 INSERT IGNORE INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id FROM roles r CROSS JOIN permissions p WHERE r.slug = 'superadmin';
 
 INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id FROM roles r JOIN permissions p ON p.slug IN ('dashboard.view','users.view','users.create','users.edit','roles.view')
+SELECT r.id, p.id FROM roles r JOIN permissions p ON p.slug IN ('dashboard.view','users.view','users.create','users.edit','roles.view','contacts.view','contacts.manage','contacts.delete','quotes.view','quotes.create','quotes.edit','quotes.send','quotes.delete')
 WHERE r.slug = 'administrador';
 
 INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id FROM roles r JOIN permissions p ON p.slug IN ('dashboard.view','users.view','roles.view')
+SELECT r.id, p.id FROM roles r JOIN permissions p ON p.slug IN ('dashboard.view','users.view','roles.view','contacts.view','quotes.view')
 WHERE r.slug = 'supervisor';

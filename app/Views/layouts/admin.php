@@ -4,7 +4,9 @@ $authUser = Auth::user();
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $isUsers = str_contains($requestPath, '/admin/users');
 $isRoles = str_contains($requestPath, '/admin/roles');
-$isDashboard = !$isUsers && !$isRoles;
+$isContacts = str_contains($requestPath, '/admin/contactos');
+$isQuotes = str_contains($requestPath, '/admin/cotizaciones');
+$isDashboard = !$isUsers && !$isRoles && !$isContacts && !$isQuotes;
 ?>
 <!doctype html>
 <html lang="es">

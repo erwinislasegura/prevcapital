@@ -23,12 +23,17 @@
         <div class="contact__panel">
             <p>Evaluación inicial para empresas</p>
             <h3>Solicite una reunión con PrevCapital</h3>
-            <form action="mailto:contacto@prevcapital.cl" enctype="text/plain" method="post">
-                <label>Nombre y apellido<input type="text" placeholder="Ej. Carolina Muñoz" required name="nombre"></label>
-                <label>Empresa<input type="text" placeholder="Nombre de la organización" required name="empresa"></label>
-                <div><label>Correo corporativo<input type="email" placeholder="nombre@empresa.cl" required name="correo"></label><label>Teléfono<input type="tel" placeholder="+56 9..." name="telefono"></label></div>
-                <label>¿Qué necesita resolver?<select name="servicio" required><option value="" disabled selected>Seleccione un servicio</option><option>Diagnóstico preventivo</option><option>Implementación DS N°44</option><option>Protocolos MINSAL</option><option>Carpeta de arranque minería</option><option>ISO 45001</option><option>Capacitaciones</option><option>Otro requerimiento</option></select></label>
-                <label>Cuéntenos brevemente<textarea name="mensaje" placeholder="Describa la necesidad de su empresa" rows="4"></textarea></label>
+            <?php if ($message = flash('success')): ?><div class="form-notice form-notice--success" role="status"><?= e($message) ?></div><?php endif; ?>
+            <?php if ($message = flash('error')): ?><div class="form-notice form-notice--error" role="alert"><?= e($message) ?></div><?php endif; ?>
+            <?php if ($errors = flash('errors')): ?><div class="form-notice form-notice--error" role="alert"><ul><?php foreach ($errors as $error): ?><li><?= e($error) ?></li><?php endforeach; ?></ul></div><?php endif; ?>
+            <form action="<?= url('/contacto') ?>" method="post">
+                <?= csrf_field() ?>
+                <label class="form-honeypot" aria-hidden="true">Sitio web<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+                <label>Nombre y apellido<input type="text" placeholder="Ej. Carolina Muñoz" required maxlength="140" name="nombre" value="<?= e(old('nombre')) ?>"></label>
+                <label>Empresa<input type="text" placeholder="Nombre de la organización" required maxlength="160" name="empresa" value="<?= e(old('empresa')) ?>"></label>
+                <div><label>Correo corporativo<input type="email" placeholder="nombre@empresa.cl" required maxlength="180" name="correo" value="<?= e(old('correo')) ?>"></label><label>Teléfono<input type="tel" placeholder="+56 9..." maxlength="60" name="telefono" value="<?= e(old('telefono')) ?>"></label></div>
+                <label>¿Qué necesita resolver?<select name="servicio" required><option value="" disabled <?= old('servicio') ? '' : 'selected' ?>>Seleccione un servicio</option><?php foreach (['Diagnóstico preventivo','Implementación DS N°44','Protocolos MINSAL','Carpeta de arranque minería','ISO 45001','Capacitaciones','Otro requerimiento'] as $service): ?><option <?= selected(old('servicio'), $service) ?>><?= e($service) ?></option><?php endforeach; ?></select></label>
+                <label>Cuéntenos brevemente<textarea name="mensaje" placeholder="Describa la necesidad de su empresa" rows="4" maxlength="3000"><?= e(old('mensaje')) ?></textarea></label>
                 <button class="button button--primary button--full" type="submit">Solicitar contacto <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
             </form>
             <small>Atención a empresas y organizaciones en Chile</small>

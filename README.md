@@ -29,7 +29,26 @@ Si el proyecto se instala en una subcarpeta, las rutas y recursos la detectan au
 - Contacto: `/contacto`
 - Inicio de sesión: `/login`
 - Panel administrativo: `/admin`
+- Solicitudes de contacto: `/admin/contactos`
+- Cotizaciones: `/admin/cotizaciones`
 - Configuración inicial: `/setup`
+
+## Correo de cotizaciones
+
+El módulo utiliza la función `mail()` de PHP, compatible con el servicio de correo habitual de cPanel. Para que los enlaces enviados sean absolutos, configure `APP_URL` con el dominio público (por ejemplo, `https://prevcapital.cl`). Los remitentes se pueden definir mediante:
+
+- `MAIL_FROM_ADDRESS`: dirección remitente.
+- `MAIL_FROM_NAME`: nombre visible del remitente.
+- `MAIL_REPLY_TO`: dirección para respuestas.
+- `MAIL_NOTIFICATION_ADDRESS`: correo que recibe avisos de aceptación o rechazo.
+
+Si no se definen, se utiliza `contacto@prevcapital.cl`. Cada envío incluye el PDF corporativo y un enlace seguro de 64 caracteres a la cotización web.
+
+## Módulos comerciales
+
+- El formulario público guarda cada solicitud en MySQL y permite gestionarla como nueva, contactada o cerrada.
+- Las cotizaciones admiten partidas, cálculo de IVA y total, PDF A4 corporativo, envío inmediato o posterior, vista web y respuesta de aceptación/rechazo.
+- Las acciones relevantes se incorporan a la trazabilidad del panel.
 
 ## Estructura
 

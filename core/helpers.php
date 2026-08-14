@@ -32,6 +32,23 @@ function asset(string $path): string
     return url($path);
 }
 
+function absolute_url(string $path = ''): string
+{
+    $generated = url($path);
+    if (preg_match('#^https?://#i', $generated)) {
+        return $generated;
+    }
+    $https = ($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off';
+    $scheme = $https ? 'https' : 'http';
+    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+    return $scheme . '://' . $host . '/' . ltrim($generated, '/');
+}
+
+function money_clp(float|int|string $amount): string
+{
+    return '$' . number_format((float) $amount, 0, ',', '.');
+}
+
 function redirect(string $path): never
 {
     header('Location: ' . url($path));
