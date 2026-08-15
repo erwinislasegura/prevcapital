@@ -326,6 +326,9 @@ footer { background:#050e15; color:#81929b; }
 .values-detail__grid h3 { margin:45px 0 12px; font-size:19px; }
 .values-detail__grid p { margin:0; color:var(--muted); font-size:13px; line-height:1.7; }
 .contact--page { background:linear-gradient(90deg,rgba(7,24,38,.99),rgba(7,24,38,.86)),url('../images/hero-industrial.webp') center/cover fixed; }
+@media (min-width:901px) {
+  .contact--page .contact__grid { grid-template-columns:minmax(0,.9fr) minmax(540px,1.1fr); gap:70px; }
+}
 .contact__intro { align-self:start; }
 .contact-points { margin-top:42px; border-top:1px solid rgba(255,255,255,.2); }
 .contact-points article { padding:22px 0; display:grid; grid-template-columns:35px 1fr; gap:18px; border-bottom:1px solid rgba(255,255,255,.15); }
