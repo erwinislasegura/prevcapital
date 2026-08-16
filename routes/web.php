@@ -6,7 +6,9 @@ use App\Controllers\AuthController;
 use App\Controllers\ClientController;
 use App\Controllers\ContactController;
 use App\Controllers\DashboardController;
+use App\Controllers\EmailSubscriptionController;
 use App\Controllers\HomeController;
+use App\Controllers\MarketingController;
 use App\Controllers\PublicQuoteController;
 use App\Controllers\QuoteController;
 use App\Controllers\RoleController;
@@ -24,6 +26,8 @@ $router->post('/contacto', [HomeController::class, 'contactStore']);
 $router->get('/cotizacion', [PublicQuoteController::class, 'show']);
 $router->get('/cotizacion/pdf', [PublicQuoteController::class, 'pdf']);
 $router->post('/cotizacion/responder', [PublicQuoteController::class, 'respond']);
+$router->get('/correo/desuscribir', [EmailSubscriptionController::class, 'show']);
+$router->post('/correo/desuscribir', [EmailSubscriptionController::class, 'store']);
 $router->get('/login', [AuthController::class, 'show']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout'], ['auth']);
@@ -68,5 +72,16 @@ $router->get('/admin/cotizaciones/pdf', [QuoteController::class, 'pdf'], ['auth'
 $router->post('/admin/cotizaciones/enviar', [QuoteController::class, 'send'], ['auth', 'permission:quotes.send']);
 $router->post('/admin/cotizaciones/crear-cliente', [QuoteController::class, 'createClient'], ['auth', 'permission:clients.create']);
 $router->post('/admin/cotizaciones/eliminar', [QuoteController::class, 'delete'], ['auth', 'permission:quotes.delete']);
+$router->get('/admin/cotizaciones/adjunto', [QuoteController::class, 'attachment'], ['auth', 'permission:quotes.view']);
+$router->post('/admin/cotizaciones/adjunto/eliminar', [QuoteController::class, 'deleteAttachment'], ['auth', 'permission:quotes.edit']);
+
+$router->get('/admin/email-marketing', [MarketingController::class, 'index'], ['auth', 'permission:marketing.view']);
+$router->get('/admin/email-marketing/plantilla', [MarketingController::class, 'template'], ['auth', 'permission:marketing.manage']);
+$router->post('/admin/email-marketing/plantilla', [MarketingController::class, 'updateTemplate'], ['auth', 'permission:marketing.manage']);
+$router->get('/admin/email-marketing/crear', [MarketingController::class, 'create'], ['auth', 'permission:marketing.manage']);
+$router->post('/admin/email-marketing/crear', [MarketingController::class, 'store'], ['auth', 'permission:marketing.manage']);
+$router->get('/admin/email-marketing/ver', [MarketingController::class, 'show'], ['auth', 'permission:marketing.view']);
+$router->post('/admin/email-marketing/estado', [MarketingController::class, 'toggle'], ['auth', 'permission:marketing.manage']);
+$router->post('/admin/email-marketing/procesar', [MarketingController::class, 'process'], ['auth', 'permission:marketing.send']);
 
 return $router;

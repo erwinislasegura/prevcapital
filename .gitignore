@@ -2,3 +2,5 @@ config/database.local.php
 .env
 .DS_Store
 Thumbs.db
+storage/quote_attachments/*
+!storage/quote_attachments/.gitkeep

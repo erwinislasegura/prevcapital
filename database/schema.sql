@@ -154,6 +154,20 @@ CREATE TABLE IF NOT EXISTS quote_items (
     CONSTRAINT fk_quote_items_quote FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS quote_attachments (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    quote_id BIGINT UNSIGNED NOT NULL,
+    original_name VARCHAR(180) NOT NULL,
+    stored_name VARCHAR(120) NOT NULL,
+    mime_type VARCHAR(120) NOT NULL,
+    file_size INT UNSIGNED NOT NULL,
+    created_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_quote_attachments_quote (quote_id),
+    CONSTRAINT fk_quote_attachments_quote FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE,
+    CONSTRAINT fk_quote_attachments_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS quote_events (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     quote_id BIGINT UNSIGNED NOT NULL,
@@ -165,6 +179,86 @@ CREATE TABLE IF NOT EXISTS quote_events (
     INDEX idx_quote_events_created_at (created_at),
     CONSTRAINT fk_quote_events_quote FOREIGN KEY (quote_id) REFERENCES quotes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS marketing_templates (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    subject_default VARCHAR(180) NOT NULL,
+    html_content MEDIUMTEXT NOT NULL,
+    text_content TEXT NOT NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_marketing_templates_user FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS marketing_contacts (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(180) NOT NULL UNIQUE,
+    name VARCHAR(140) NULL,
+    company VARCHAR(160) NULL,
+    status ENUM('subscribed','unsubscribed','bounced') NOT NULL DEFAULT 'subscribed',
+    source VARCHAR(100) NOT NULL,
+    consent_at DATETIME NULL,
+    unsubscribed_at DATETIME NULL,
+    unsubscribe_token CHAR(64) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_marketing_contacts_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS marketing_campaigns (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(160) NOT NULL,
+    subject VARCHAR(180) NOT NULL,
+    html_content MEDIUMTEXT NOT NULL,
+    text_content TEXT NOT NULL,
+    status ENUM('scheduled','sending','paused','completed') NOT NULL DEFAULT 'scheduled',
+    scheduled_at DATETIME NOT NULL,
+    interval_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 10,
+    total_recipients INT UNSIGNED NOT NULL DEFAULT 0,
+    sent_count INT UNSIGNED NOT NULL DEFAULT 0,
+    failed_count INT UNSIGNED NOT NULL DEFAULT 0,
+    completed_at DATETIME NULL,
+    created_by INT UNSIGNED NULL,
+    updated_by INT UNSIGNED NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_marketing_campaigns_status (status),
+    INDEX idx_marketing_campaigns_scheduled (scheduled_at),
+    CONSTRAINT fk_marketing_campaigns_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_marketing_campaigns_updater FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS marketing_campaign_recipients (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    campaign_id BIGINT UNSIGNED NOT NULL,
+    contact_id BIGINT UNSIGNED NOT NULL,
+    email VARCHAR(180) NOT NULL,
+    name VARCHAR(140) NULL,
+    company VARCHAR(160) NULL,
+    status ENUM('queued','sending','sent','failed','unsubscribed') NOT NULL DEFAULT 'queued',
+    scheduled_at DATETIME NOT NULL,
+    sent_at DATETIME NULL,
+    attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    message_id VARCHAR(100) NULL,
+    last_error VARCHAR(1000) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_marketing_campaign_email (campaign_id, email),
+    INDEX idx_marketing_queue (status, scheduled_at),
+    CONSTRAINT fk_marketing_recipients_campaign FOREIGN KEY (campaign_id) REFERENCES marketing_campaigns(id) ON DELETE CASCADE,
+    CONSTRAINT fk_marketing_recipients_contact FOREIGN KEY (contact_id) REFERENCES marketing_contacts(id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS marketing_settings (
+    id TINYINT UNSIGNED PRIMARY KEY,
+    interval_minutes SMALLINT UNSIGNED NOT NULL DEFAULT 10,
+    last_delivery_at DATETIME NULL,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO marketing_settings (id, interval_minutes) VALUES (1, 10);
 
 INSERT IGNORE INTO roles (name, slug, description, is_system) VALUES
 ('Superadministrador', 'superadmin', 'Acceso completo a todos los módulos y configuraciones.', 1),
@@ -198,13 +292,18 @@ INSERT IGNORE INTO permissions (name, slug, module, description) VALUES
 ('Editar clientes', 'clients.edit', 'Clientes', 'Actualizar datos comerciales de clientes.'),
 ('Eliminar clientes', 'clients.delete', 'Clientes', 'Eliminar clientes sin borrar sus cotizaciones históricas.');
 
+INSERT IGNORE INTO permissions (name, slug, module, description) VALUES
+('Ver Email Marketing', 'marketing.view', 'Email Marketing', 'Consultar campañas, entregabilidad y destinatarios.'),
+('Gestionar Email Marketing', 'marketing.manage', 'Email Marketing', 'Editar la plantilla y crear o pausar campañas.'),
+('Enviar Email Marketing', 'marketing.send', 'Email Marketing', 'Procesar la cola de correos programados.');
+
 INSERT IGNORE INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id FROM roles r CROSS JOIN permissions p WHERE r.slug = 'superadmin';
 
 INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id FROM roles r JOIN permissions p ON p.slug IN ('dashboard.view','users.view','users.create','users.edit','roles.view','contacts.view','contacts.manage','contacts.delete','clients.view','clients.create','clients.edit','clients.delete','quotes.view','quotes.create','quotes.edit','quotes.send','quotes.delete')
+SELECT r.id, p.id FROM roles r JOIN permissions p ON p.slug IN ('dashboard.view','users.view','users.create','users.edit','roles.view','contacts.view','contacts.manage','contacts.delete','clients.view','clients.create','clients.edit','clients.delete','quotes.view','quotes.create','quotes.edit','quotes.send','quotes.delete','marketing.view','marketing.manage','marketing.send')
 WHERE r.slug = 'administrador';
 
 INSERT IGNORE INTO role_permissions (role_id, permission_id)
-SELECT r.id, p.id FROM roles r JOIN permissions p ON p.slug IN ('dashboard.view','users.view','roles.view','contacts.view','clients.view','quotes.view')
+SELECT r.id, p.id FROM roles r JOIN permissions p ON p.slug IN ('dashboard.view','users.view','roles.view','contacts.view','clients.view','quotes.view','marketing.view')
 WHERE r.slug = 'supervisor';

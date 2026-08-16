@@ -21,9 +21,17 @@ return [
         'linkedin' => getenv('SOCIAL_LINKEDIN_URL') ?: '',
     ],
     'mail' => [
+        'transport' => getenv('MAIL_TRANSPORT') ?: 'mail',
+        'host' => getenv('MAIL_HOST') ?: '',
+        'port' => (int) (getenv('MAIL_PORT') ?: 587),
+        'encryption' => getenv('MAIL_ENCRYPTION') ?: 'tls',
+        'username' => getenv('MAIL_USERNAME') ?: '',
+        'password' => getenv('MAIL_PASSWORD') ?: '',
+        'timeout' => (int) (getenv('MAIL_TIMEOUT') ?: 20),
         'from_address' => getenv('MAIL_FROM_ADDRESS') ?: 'contacto@prevcapital.cl',
         'from_name' => getenv('MAIL_FROM_NAME') ?: 'PrevCapital',
         'reply_to' => getenv('MAIL_REPLY_TO') ?: 'contacto@prevcapital.cl',
         'notification_address' => getenv('MAIL_NOTIFICATION_ADDRESS') ?: 'contacto@prevcapital.cl',
+        'dkim_selector' => getenv('MAIL_DKIM_SELECTOR') ?: 'default',
     ],
 ];

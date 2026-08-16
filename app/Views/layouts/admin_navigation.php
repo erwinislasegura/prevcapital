@@ -23,6 +23,11 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6V3Z"></path><path d="M14 3v4h4M9 11h6M9 15h6"></path></svg><span>Cotizaciones</span>
     </a>
     <?php endif; ?>
+    <?php if (\App\Core\Auth::can('marketing.view')): ?>
+    <a class="<?= $isMarketing ? 'active' : '' ?>" href="<?= url('/admin/email-marketing') ?>">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v14H3zM3 7l9 6 9-6"></path><path d="M17 3v4M15 5h4"></path></svg><span>Email Marketing</span>
+    </a>
+    <?php endif; ?>
     <?php if (\App\Core\Auth::can('users.view')): ?>
     <a class="<?= $isUsers ? 'active' : '' ?>" href="<?= url('/admin/users') ?>">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><path d="M3 19c.4-4 2.4-6 6-6s5.6 2 6 6M16 5c2 .2 3 1.2 3 3s-1 2.8-3 3M17 13c2.3.6 3.6 2.4 4 5"></path></svg><span>Usuarios</span>

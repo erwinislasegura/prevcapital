@@ -535,6 +535,13 @@ footer { background:#050e15; color:#81929b; }
 }
 .form-notice { margin:0 0 18px; padding:13px 15px; border-left:4px solid; font-size:12px; line-height:1.5; }
 .form-notice ul { margin:0; padding-left:18px; }
+.unsubscribe-card { width:min(680px,100%); margin:0 auto; padding:58px; border:1px solid var(--line); background:#fff; text-align:center; box-shadow:0 18px 50px rgba(7,24,38,.08); }
+.unsubscribe-card__icon { width:62px; height:62px; margin:0 auto 22px; display:grid; place-items:center; border-radius:50%; background:#dff7f4; color:#087b76; font-size:28px; font-weight:800; }
+.unsubscribe-card h2 { margin:0 0 16px; color:var(--navy); font-size:clamp(26px,3vw,38px); }
+.unsubscribe-card p { margin:0 auto 26px; max-width:530px; color:var(--muted); line-height:1.75; }
+.unsubscribe-card form { margin-bottom:24px; }
+.unsubscribe-card>a { color:#087b76; font-size:13px; font-weight:800; }
+@media (max-width:640px) { .unsubscribe-card { padding:38px 22px; } }
 .form-notice--success { background:#e5f7f4; border-color:var(--teal); color:#075c59; }
 .form-notice--error { background:#fff0f0; border-color:#bd3d3d; color:#7e2424; }
 .button--outline { border-color:#9eb0b8; background:transparent; color:var(--navy); }

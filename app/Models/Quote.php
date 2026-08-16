@@ -53,6 +53,7 @@ final class Quote
         $events->execute(['id' => $quote['id']]);
         $quote['items'] = $items->fetchAll();
         $quote['events'] = $events->fetchAll();
+        $quote['attachments'] = QuoteAttachment::forQuote((int) $quote['id']);
         return $quote;
     }
 

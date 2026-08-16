@@ -10,7 +10,9 @@ use App\Core\Csrf;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Models\Quote;
+use App\Models\QuoteAttachment;
 use App\Support\Mailer;
+use App\Support\QuoteAttachmentStorage;
 use App\Support\QuotePdf;
 
 final class QuoteController extends Controller
@@ -44,9 +46,17 @@ final class QuoteController extends Controller
     {
         $this->validateCsrf('/admin/cotizaciones/crear');
         [$data, $items, $errors] = $this->validatedData();
+        $errors = array_merge($errors, QuoteAttachmentStorage::validate((array) ($_FILES['attachments'] ?? [])));
         if ($errors) $this->validationRedirect('/admin/cotizaciones/crear', $errors);
         $createdClientId = $this->createClientFromDataWhenRequested($data);
         $id = Quote::create($data, $items, Auth::id());
+        try {
+            $storedAttachments = QuoteAttachmentStorage::store($id, (array) ($_FILES['attachments'] ?? []), Auth::id());
+            if ($storedAttachments) Quote::addEvent($id, 'attachments_added', count($storedAttachments) . ' adjunto(s) incorporado(s).');
+        } catch (\Throwable) {
+            flash('error', 'La cotización fue creada, pero no fue posible guardar los adjuntos. Revise permisos de escritura en storage/quote_attachments.');
+            $this->redirect('/admin/cotizaciones/ver?id=' . $id);
+        }
         AuditLog::record('quotes.created', 'quote', $id, 'Cotización creada.');
         if ($createdClientId !== null) AuditLog::record('clients.created_from_quote', 'client', $createdClientId, 'Cliente creado junto con la cotización ' . $id . '.');
         $sendNow = isset($_POST['send_now']);
@@ -90,9 +100,17 @@ final class QuoteController extends Controller
         }
         $this->validateCsrf('/admin/cotizaciones/editar?id=' . $id);
         [$data, $items, $errors] = $this->validatedData();
+        $errors = array_merge($errors, QuoteAttachmentStorage::validate((array) ($_FILES['attachments'] ?? []), count($quote['attachments'] ?? [])));
         if ($errors) $this->validationRedirect('/admin/cotizaciones/editar?id=' . $id, $errors);
         $createdClientId = $this->createClientFromDataWhenRequested($data);
         Quote::update($id, $data, $items, Auth::id());
+        try {
+            $storedAttachments = QuoteAttachmentStorage::store($id, (array) ($_FILES['attachments'] ?? []), Auth::id());
+            if ($storedAttachments) Quote::addEvent($id, 'attachments_added', count($storedAttachments) . ' adjunto(s) incorporado(s).');
+        } catch (\Throwable) {
+            flash('error', 'Los datos fueron actualizados, pero no fue posible guardar los nuevos adjuntos.');
+            $this->redirect('/admin/cotizaciones/ver?id=' . $id);
+        }
         AuditLog::record('quotes.updated', 'quote', $id, 'Cotización actualizada.');
         if ($createdClientId !== null) AuditLog::record('clients.created_from_quote', 'client', $createdClientId, 'Cliente creado desde la cotización ' . $id . '.');
         flash('success', 'Cotización actualizada correctamente.');
@@ -115,6 +133,45 @@ final class QuoteController extends Controller
         $id = (int) ($_POST['id'] ?? 0);
         $this->sendQuote($id, '/admin/cotizaciones/ver?id=' . $id);
         $this->redirect('/admin/cotizaciones/ver?id=' . $id);
+    }
+
+    public function attachment(): void
+    {
+        $attachment = QuoteAttachment::find((int) ($_GET['id'] ?? 0));
+        if (!$attachment || !Quote::find((int) $attachment['quote_id'])) {
+            http_response_code(404);
+            return;
+        }
+        $path = QuoteAttachmentStorage::absolutePath($attachment);
+        if (!is_file($path)) {
+            http_response_code(404);
+            return;
+        }
+        header('X-Content-Type-Options: nosniff');
+        header('Content-Type: ' . $attachment['mime_type']);
+        header('Content-Disposition: attachment; filename="' . str_replace(['"', "\r", "\n"], '', (string) $attachment['original_name']) . '"');
+        header('Content-Length: ' . filesize($path));
+        readfile($path);
+    }
+
+    public function deleteAttachment(): void
+    {
+        $this->validateCsrf('/admin/cotizaciones');
+        $attachment = QuoteAttachment::find((int) ($_POST['id'] ?? 0));
+        if (!$attachment) {
+            flash('error', 'El adjunto indicado no existe.');
+            $this->redirect('/admin/cotizaciones');
+        }
+        $quote = Quote::find((int) $attachment['quote_id']);
+        if (!$quote || in_array($quote['status'], ['accepted', 'rejected'], true)) {
+            flash('error', 'No es posible eliminar adjuntos de una cotización respondida.');
+            $this->redirect('/admin/cotizaciones/ver?id=' . (int) $attachment['quote_id']);
+        }
+        QuoteAttachmentStorage::delete($attachment);
+        Quote::addEvent((int) $quote['id'], 'attachment_deleted', 'Adjunto eliminado: ' . $attachment['original_name'] . '.');
+        AuditLog::record('quotes.attachment_deleted', 'quote', (int) $quote['id'], 'Adjunto eliminado.');
+        flash('success', 'Adjunto eliminado correctamente.');
+        $this->redirect('/admin/cotizaciones/ver?id=' . (int) $quote['id']);
     }
 
     public function createClient(): void
@@ -164,6 +221,7 @@ final class QuoteController extends Controller
         } elseif (in_array($quote['status'], ['accepted', 'rejected'], true)) {
             flash('error', 'No se puede eliminar una cotización que ya fue respondida.');
         } else {
+            QuoteAttachmentStorage::deleteQuoteFiles($quote['attachments'] ?? []);
             Quote::delete($id);
             AuditLog::record('quotes.deleted', 'quote', $id, 'Cotización eliminada.');
             flash('success', 'Cotización eliminada correctamente.');
@@ -189,7 +247,7 @@ final class QuoteController extends Controller
             }
             Quote::markSent($id);
             AuditLog::record('quotes.sent', 'quote', $id, 'Cotización enviada a ' . $quote['email'] . '.');
-            flash('success', 'Cotización enviada con el PDF y enlace de respuesta.');
+            flash('success', 'Cotización enviada con el PDF, sus adjuntos y el enlace de respuesta.');
         } catch (\Throwable) {
             flash('error', 'No fue posible enviar el correo. Revise la cuenta de correo configurada en el servidor.');
         }
